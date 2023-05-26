@@ -44,31 +44,31 @@ resource "aws_acm_certificate_validation" "cert_validaition" {
 resource "aws_security_group" "alb_secg" {
   name        = "alb_sg"
   description = "Security group for alb"
-  vpc_id      = module.mig-vpc.vpc_id
+  vpc_id      = data.aws_vpc.migra_project.id
 
   ingress {
-    description      = "TLS from VPC"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0"]
+    description = "TLS from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description      = "http from VPC"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0"]
+    description = "http from VPC"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   tags = {
     Name = "alb_secg"
   }
@@ -78,15 +78,15 @@ resource "aws_security_group" "alb_secg" {
 resource "aws_security_group" "pga_sg" {
   name        = "pga_sg"
   description = "Allow inbound traffic"
-  vpc_id      = module.mig-vpc.vpc_id
+  vpc_id      = data.aws_vpc.migra_project.id
 
   ingress {
-    description      = "https connection from VPC"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
+    description = "https connection from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     #cidr_blocks      = [aws_vpc.main.cidr_block]
-    security_groups = [data.aws_security_group.alb_secg.id]
+    # security_groups = [data.aws_security_group.alb_secg.id]
   }
 
   # ingress {
@@ -98,18 +98,18 @@ resource "aws_security_group" "pga_sg" {
   #}
 
   ingress {
-    description      = "http into pgadmin"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = [data.aws_security_group.alb_secg.id]
+    description = "http into pgadmin"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    # cidr_blocks = [data.aws_security_group.alb_secg.id]
   }
 
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -122,7 +122,7 @@ resource "aws_lb" "alb" {
   name               = "alb"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_secg.id]
-  subnets            = module.mig-vpc.public_subnets
+  subnets            = data.aws_subnet.mig_pub_sub_1
 
   enable_deletion_protection = true
 
@@ -143,7 +143,7 @@ resource "aws_lb_listener" "alb_https_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target_pgadmin.arn
   }
- }
+}
 
 resource "aws_lb_listener" "alb_http_listener" {
   load_balancer_arn = aws_lb.alb.arn
@@ -156,7 +156,7 @@ resource "aws_lb_listener" "alb_http_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target_pgadmin.arn
   }
- }
+}
 
 #redirection from port 80 to 443
 resource "aws_lb_listener" "alb_redirect" {
@@ -177,10 +177,10 @@ resource "aws_lb_listener" "alb_redirect" {
 
 #target group for pgadmin
 resource "aws_lb_target_group" "target_pgadmin" {
-  name     = "target_grp_pgadmin"
+  name     = "target-grp-pgadmin"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = module.mig-vpc.vpc_id
+  vpc_id   = data.aws_vpc.migra_project.id
 }
 
 # resource "aws_vpc" "main" {
