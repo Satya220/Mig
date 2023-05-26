@@ -122,7 +122,7 @@ resource "aws_lb" "alb" {
   name               = "alb"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_secg.id]
-  subnets            = data.aws_subnet.mig_pub_sub_1
+  subnets            =  [data.aws_subnet.mig_pub_sub_1.id,data.aws_subnet.mig_pub_sub_2.id]
 
   enable_deletion_protection = true
 
