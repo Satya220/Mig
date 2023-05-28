@@ -187,5 +187,21 @@ resource "aws_lb_target_group" "target_pgadmin" {
 #   cidr_block = "10.0.0.0/16"
 # }
 
+# health_check {
+#   healthy_threshold = 3
+#   interval = 30
+#   matcher = "200"
+#   path = 
+#   protocol = "HTTP"
+# }
+
+resource "aws_instance" "pgadmin_instance" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "PGadmin_server"
+  }
+}
 
 
