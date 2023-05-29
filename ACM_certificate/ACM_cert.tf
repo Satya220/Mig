@@ -149,8 +149,7 @@ resource "aws_lb_listener" "alb_http_listener" {
   load_balancer_arn = aws_lb.alb.arn
   port              = "80"
   protocol          = "HTTP"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:eu-west-1:309162523117:certificate/e78edeae-9c3c-44e4-a443-5f507cb965e7"
+
 
   default_action {
     type             = "forward"
@@ -187,12 +186,35 @@ resource "aws_lb_target_group" "target_pgadmin" {
 #   cidr_block = "10.0.0.0/16"
 # }
 
-# health_check {
-#   healthy_threshold = 3
-#   interval = 30
-#   matcher = "200"
-#   path = 
-#   protocol = "HTTP"
-# }
+health_check {
+  healthy_threshold = 3
+  interval = 30
+  matcher = "200"
+  path = "/"
+  protocol = "HTTP"
+}
 
+resource "aws_launch_template" "autoscaling_temp" {
+  name_prefix   = "autoscale_temp"
+  image_id      = data.aws_ami.ubuntu
+  instance_type = "t2.micro"
+  vpc_security_group_ids = aws_security_group.pga_sg.id
+  user_data = file("apache.sh")
+}
+
+resource "aws_autoscaling_group" "auto_pggroup" {
+  name               = "auto_pggroup"
+  desired_capacity   = 2
+  max_size           = 2
+  min_size           = 2
+  health_check_grace_period = 300
+  health_check_type         = "ELB"
+  vpc_zone_identifier       = [data.aws_subnet.mig_pub_sub_1.id, data.aws_subnet.mig_pub_sub_2.id]
+
+
+  # launch_template {
+  #   id      = aws_launch_template.foobar.id
+  #   version = "$Latest"
+  # }
+}
 
