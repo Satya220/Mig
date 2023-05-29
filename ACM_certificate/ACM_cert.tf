@@ -195,13 +195,4 @@ resource "aws_lb_target_group" "target_pgadmin" {
 #   protocol = "HTTP"
 # }
 
-resource "aws_instance" "pgadmin_instance" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-
-  tags = {
-    Name = "PGadmin_server"
-  }
-}
-
 
