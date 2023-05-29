@@ -86,7 +86,7 @@ resource "aws_security_group" "pga_sg" {
     to_port     = 443
     protocol    = "tcp"
     #cidr_blocks      = [aws_vpc.main.cidr_block]
-    # security_groups = [data.aws_security_group.alb_secg.id]
+    security_groups = [aws_security_group.alb_secg.id]
   }
 
   # ingress {
@@ -184,7 +184,7 @@ resource "aws_launch_template" "autoscaling_temp" {
   name_prefix   = "autoscale_temp"
   image_id      = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  # vpc_security_group_ids = aws_security_group.pga_sg.id
+  vpc_security_group_ids = [aws_security_group.pga_sg.id]
   user_data = filebase64("apache.sh")
 }
 
