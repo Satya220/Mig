@@ -152,18 +152,6 @@ resource "aws_lb_listener" "alb_http_listener" {
 
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.target_pgadmin.arn
-  }
-}
-
-#redirection from port 80 to 443
-resource "aws_lb_listener" "alb_redirect" {
-  load_balancer_arn = aws_lb.alb.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
     type = "redirect"
 
     redirect {
@@ -180,26 +168,24 @@ resource "aws_lb_target_group" "target_pgadmin" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.migra_project.id
-}
-
-# resource "aws_vpc" "main" {
-#   cidr_block = "10.0.0.0/16"
-# }
-
-health_check {
+  health_check {
   healthy_threshold = 3
   interval = 30
   matcher = "200"
   path = "/"
   protocol = "HTTP"
 }
+}
+# resource "aws_vpc" "main" {
+#   cidr_block = "10.0.0.0/16"
+# }
 
 resource "aws_launch_template" "autoscaling_temp" {
   name_prefix   = "autoscale_temp"
-  image_id      = data.aws_ami.ubuntu
+  image_id      = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  vpc_security_group_ids = aws_security_group.pga_sg.id
-  user_data = file("apache.sh")
+  # vpc_security_group_ids = aws_security_group.pga_sg.id
+  user_data = filebase64("apache.sh")
 }
 
 resource "aws_autoscaling_group" "auto_pggroup" {
@@ -212,9 +198,9 @@ resource "aws_autoscaling_group" "auto_pggroup" {
   vpc_zone_identifier       = [data.aws_subnet.mig_pub_sub_1.id, data.aws_subnet.mig_pub_sub_2.id]
 
 
-  # launch_template {
-  #   id      = aws_launch_template.foobar.id
-  #   version = "$Latest"
-  # }
+  launch_template {
+    id      = aws_launch_template.autoscaling_temp.id
+    version = aws_launch_template.autoscaling_temp.latest_version
+  }
 }
 
