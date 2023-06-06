@@ -3,9 +3,13 @@ resource "aws_route53_record" "dns_validation" {
   zone_id = "Z08290211FOHNWIHSYSPP"
   name    = "satya.aws.crlabs.cloud"
   type    = "A"
-  ttl     = 300
-  records = ["192.168.0.0"]
-}
+  
+  alias {
+    name                   = aws_lb.alb.dns_name
+    zone_id                = aws_lb.alb.zone_id
+    evaluate_target_health = true
+  }
+  }
 
 #ACM_certificate
 resource "aws_acm_certificate" "aws_cert" {
@@ -203,4 +207,8 @@ resource "aws_autoscaling_group" "auto_pggroup" {
     version = aws_launch_template.autoscaling_temp.latest_version
   }
 }
+
+#A record for alb
+
+
 
