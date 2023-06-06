@@ -1,14 +1,14 @@
 #ONPREM_APP_SERVER
 resource "aws_instance" "onprem_app_instance" {
-  ami           = data.aws_ami.ubuntu 
+  ami           = "data.aws_ami.ubuntu"
   instance_type = "t2.micro"
   key_name = "migration_key"
-  user_data =  file("${path.module}/app_user_data.sh.tpl" ,{
-  database_private_ip = aws_instance.onprem_db_instance.private_ip
+  user_data =  templatefile("${path.module}/app_user_data.sh.tpl" ,{
+  db_private_ip = aws_instance.onprem_db_instance.private_ip
   mysql_root_password = local.mysql_password
   })
   network_interface {
-    network_interface_id = aws_network_interface.onprem_app_ni.id
+    network_interface_id = aws_network_interface.app_onprem_ni.id
     device_index = 0
   }
   tags = {

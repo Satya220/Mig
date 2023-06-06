@@ -1,12 +1,13 @@
 #ON-PREMISES-DB-SERVER
 resource "aws_instance" "onprem_db_instance" {
-  ami           = data.aws_ami.ubuntu
+  ami           = "data.aws_ami.ubuntu"
   instance_type = "t2.medium"
-  subnet_id     = data.aws_subnet.onprem_data
+  subnet_id     = data.aws_subnet.onprem_data.id
   key_name = "migration_key"
   vpc_security_group_ids = [aws_security_group.onprem_db_sg.id]
-  user_data = templatefile("${path.module}/db_user_data.sh.tpl" , {
-  onpremapp_private_ip = aws_network_interface.app_onprem_ni.private_ip,
+  user_data = templatefile("${path.module}/db_user_data.sh.tpl", 
+  {
+  app_private_ip = aws_network_interface.app_onprem_ni.private_ip,
   mysql_root_password = local.mysql_password 
   })
 tags = {
