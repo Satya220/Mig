@@ -10,6 +10,8 @@ module "mig-vpc" {
   database_subnets = [for i, v in local.availability_zones : cidrsubnet(local.database_subnet_cidr, 2, i)]
   
   enable_nat_gateway = true
+  single_nat_gateway = true
+  one_nat_gateway_per_az = false
 }
 
 module "on_prem_vpc" {
@@ -22,4 +24,8 @@ module "on_prem_vpc" {
   private_subnets = [for i, v in local.azs_on_prem : cidrsubnet(local.private_subnet_on_prem_cidr, 2, i)]
   public_subnets  = [for i, v in local.azs_on_prem : cidrsubnet(local.public_subnet_on_prem_cidr, 2, i)]
   database_subnets = [for i, v in local.azs_on_prem : cidrsubnet(local.database_subnet_on_prem_cidr, 2, i)]
+  map_public_ip_on_launch = true
+  enable_nat_gateway = true
+  single_nat_gateway = true
+  one_nat_gateway_per_az = false
 }

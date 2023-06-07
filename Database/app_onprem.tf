@@ -4,8 +4,8 @@ resource "aws_instance" "onprem_app_instance" {
   instance_type = "t2.micro"
   key_name      = "migration_key"
   user_data = templatefile("${path.module}/app_user_data.sh.tpl", {
-    db_private_ip       = aws_instance.onprem_db_instance.private_ip
-    mysql_root_password = local.mysql_password
+  db_private_ip       = aws_instance.onprem_db_instance.private_ip
+  mysql_root_password = local.mysql_password
   })
   network_interface {
     network_interface_id = aws_network_interface.app_onprem_ni.id
