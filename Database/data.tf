@@ -1,8 +1,8 @@
 data "aws_subnet" "onprem_data" {
-    filter {
+  filter {
     name   = "tag:Name"
     values = ["on_prem_vpc-private-eu-west-1a"]
-}
+  }
 }
 
 data "aws_ami" "ubuntu" {
@@ -22,10 +22,10 @@ data "aws_ami" "ubuntu" {
 }
 
 data "aws_subnet" "onprem_data_pub" {
-    filter {
+  filter {
     name   = "tag:Name"
     values = ["on_prem_vpc-public-eu-west-1a"]
-}
+  }
 }
 
 data "aws_vpc" "onprem_app" {

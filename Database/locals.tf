@@ -1,3 +1,3 @@
 locals {
-    mysql_password = "pass3456"
+  mysql_password = "pass3456"
 }
