@@ -25,13 +25,23 @@ resource "aws_network_interface" "app_onprem_ni" {
   }
 }
 
+resource "aws_eip" "app_eip" {
+  #vpc = true
+  network_interface = aws_network_interface.app_onprem_ni.id
+}
+
+resource "aws_eip_association" "eip_assoc" {
+  instance_id   = aws_instance.onprem_app_instance.id
+  allocation_id = aws_eip.app_eip.id
+}
+
 resource "aws_security_group" "onprem_app_sg" {
   name        = "onprem_app_sg"
   description = "security group of onprem db"
   vpc_id      = data.aws_vpc.onprem_app.id
 
   ingress {
-    description = "TLS from VPC"
+    description = "allow ssh port"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -39,7 +49,7 @@ resource "aws_security_group" "onprem_app_sg" {
   }
 
   ingress {
-    description = "TLS from VPC"
+    description = "allow https port"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -47,7 +57,7 @@ resource "aws_security_group" "onprem_app_sg" {
   }
 
   ingress {
-    description = "TLS from VPC"
+    description = "allow http port"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"

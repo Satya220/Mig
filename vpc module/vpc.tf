@@ -9,6 +9,7 @@ module "mig-vpc" {
   public_subnets  = [for i, v in local.availability_zones : cidrsubnet(local.public_subnet_cidr, 2, i)]
   database_subnets = [for i, v in local.availability_zones : cidrsubnet(local.database_subnet_cidr, 2, i)]
   
+  map_public_ip_on_launch = true
   enable_nat_gateway = true
   single_nat_gateway = true
   one_nat_gateway_per_az = false
