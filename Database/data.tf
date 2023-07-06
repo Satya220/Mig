@@ -34,3 +34,10 @@ data "aws_vpc" "onprem_app" {
     values = ["on_prem_vpc"]
   }
 }
+
+data "aws_vpc" "post_db" {
+  filter {
+    name   = "tag:Name"
+    values = ["cloud_vpc"]
+  }
+}
